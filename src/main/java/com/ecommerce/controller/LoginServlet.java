@@ -1,39 +1,62 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.dao.UserDAO;
-import com.ecommerce.models.ResultModel;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import com.ecommerce.models.User;
+import com.ecommerce.utils.PasswordUtils;
+import com.ecommerce.utils.ValidationUtils;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+
+@WebServlet("/login")
 public class LoginServlet extends HttpServlet {
-    
-    private UserDAO userDAO = new UserDAO();
-    
+    private final UserDAO userDAO = new UserDAO();
+
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) 
-            throws ServletException, IOException {
-        
-        String email = req.getParameter("email");
-        String password = req.getParameter("password");
-        
-        ResultModel result = userDAO.loginUser(email, password);
-        
-        if (result.isSuccess()) {
-            req.getSession().setAttribute("email", result.getEmail());
-            req.getSession().setAttribute("role", result.getRole());
-            req.getSession().setAttribute("active", result.getActive());
-            
-            if ("admin".equals(result.getRole())) {
-                resp.sendRedirect(req.getContextPath() + "/admin-dashboard");
-            } else {
-                resp.sendRedirect(req.getContextPath() + "/user-home");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        request.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(request, response);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        String email = request.getParameter("email");
+        String password = request.getParameter("password");
+        String remember = request.getParameter("remember");
+
+        if (!ValidationUtils.isValidEmail(email) || ValidationUtils.isBlank(password)) {
+            request.setAttribute("error", "Please enter a valid email and password.");
+            doGet(request, response);
+            return;
+        }
+
+        try {
+            User user = userDAO.findByEmail(email);
+            if (user == null || !PasswordUtils.verifyPassword(password, user.getPasswordSalt(), user.getPasswordHash())) {
+                request.setAttribute("error", "Invalid email or password.");
+                doGet(request, response);
+                return;
             }
-        } else {
-            req.setAttribute("error", result.getMessage());
-            req.getRequestDispatcher("/WEB-INF/views/auth/login.jsp").forward(req, resp);
+
+            request.getSession().setAttribute("authUser", user);
+            if ("on".equals(remember)) {
+                String token = PasswordUtils.randomToken();
+                userDAO.saveRememberToken(user.getId(), token);
+                Cookie cookie = new Cookie("rememberToken", token);
+                cookie.setMaxAge(7 * 24 * 60 * 60);
+                cookie.setHttpOnly(true);
+                cookie.setPath(request.getContextPath().isEmpty() ? "/" : request.getContextPath());
+                response.addCookie(cookie);
+            }
+
+            response.sendRedirect(request.getContextPath() + (user.isAdmin() ? "/admin/dashboard" : "/home"));
+        } catch (SQLException e) {
+            throw new ServletException("Login failed", e);
         }
     }
 }

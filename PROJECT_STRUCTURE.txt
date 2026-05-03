@@ -1,0 +1,71 @@
+AutomobileSparePartsEcommerce/
+├── pom.xml
+├── README.txt
+├── PROJECT_STRUCTURE.txt
+├── docs/
+│   ├── ERD.md
+│   └── WIREFRAME.md
+├── src/main/java/com/ecommerce/
+│   ├── controller/
+│   │   ├── LoginServlet.java
+│   │   ├── RegisterServlet.java
+│   │   ├── LogoutServlet.java
+│   │   ├── AdminDashboardServlet.java
+│   │   ├── AddProductServlet.java
+│   │   ├── UpdateProductServlet.java
+│   │   ├── DeleteProductServlet.java
+│   │   ├── ViewProductsServlet.java
+│   │   ├── AddToCartServlet.java
+│   │   ├── ViewCartServlet.java
+│   │   ├── CheckoutServlet.java
+│   │   ├── PlaceOrderServlet.java
+│   │   └── ViewOrdersServlet.java
+│   ├── dao/
+│   │   ├── UserDAO.java
+│   │   ├── ProductDAO.java
+│   │   └── OrderDAO.java
+│   ├── models/
+│   │   ├── User.java
+│   │   ├── Product.java
+│   │   ├── Order.java
+│   │   ├── OrderItem.java
+│   │   └── CartItem.java
+│   ├── utils/
+│   │   ├── DBConnection.java
+│   │   ├── PasswordUtils.java
+│   │   └── ValidationUtils.java
+│   ├── filter/
+│   │   └── AuthFilter.java
+│   └── queries/
+│       └── Queries.java
+├── src/main/resources/
+│   └── database.sql
+└── src/main/webapp/
+    ├── WEB-INF/
+    │   ├── web.xml
+    │   └── views/
+    │       ├── auth/
+    │       │   ├── login.jsp
+    │       │   └── register.jsp
+    │       ├── admin/
+    │       │   ├── dashboard.jsp
+    │       │   ├── products.jsp
+    │       │   ├── add-product.jsp
+    │       │   └── edit-product.jsp
+    │       └── user/
+    │           ├── home.jsp
+    │           ├── products.jsp
+    │           ├── cart.jsp
+    │           ├── checkout.jsp
+    │           └── orders.jsp
+    ├── components/
+    │   ├── header.jsp
+    │   └── footer.jsp
+    ├── css/
+    │   └── style.css
+    ├── js/
+    │   └── script.js
+    ├── uploads/
+    │   ├── products/
+    │   └── profiles/
+    └── index.jsp

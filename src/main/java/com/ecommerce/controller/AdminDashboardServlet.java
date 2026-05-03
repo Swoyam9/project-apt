@@ -1,35 +1,26 @@
 package com.ecommerce.controller;
 
 import com.ecommerce.dao.ProductDAO;
-import com.ecommerce.dao.UserDAO;
-import com.ecommerce.dao.OrderDAO;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
+
+@WebServlet("/admin/dashboard")
 public class AdminDashboardServlet extends HttpServlet {
-    
-    private ProductDAO productDAO = new ProductDAO();
-    private UserDAO userDAO = new UserDAO();
-    private OrderDAO orderDAO = new OrderDAO();
-    
+    private final ProductDAO productDAO = new ProductDAO();
+
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) 
-            throws ServletException, IOException {
-        
-        int totalProducts = productDAO.getTotalProducts();
-        int totalUsers = userDAO.getAllUsers().size();
-        int totalOrders = orderDAO.getTotalOrders();
-        double totalRevenue = orderDAO.getTotalRevenue();
-        
-        req.setAttribute("totalProducts", totalProducts);
-        req.setAttribute("totalUsers", totalUsers);
-        req.setAttribute("totalOrders", totalOrders);
-        req.setAttribute("totalRevenue", totalRevenue);
-        req.setAttribute("recentOrders", orderDAO.getRecentOrders(5));
-        
-        req.getRequestDispatcher("/WEB-INF/views/admin/dashboard.jsp").forward(req, resp);
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        try {
+            request.setAttribute("products", productDAO.findAll());
+            request.getRequestDispatcher("/WEB-INF/views/admin/dashboard.jsp").forward(request, response);
+        } catch (SQLException e) {
+            throw new ServletException("Could not load dashboard", e);
+        }
     }
 }

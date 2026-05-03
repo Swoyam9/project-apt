@@ -1,164 +1,108 @@
 package com.ecommerce.dao;
 
-import com.ecommerce.models.ProductModel;
-import com.ecommerce.utils.DatabaseConn;
+import com.ecommerce.models.Product;
 import com.ecommerce.queries.Queries;
+import com.ecommerce.utils.DBConnection;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ProductDAO {
-    
-    public List<ProductModel> getAllProducts() {
-        List<ProductModel> products = new ArrayList<>();
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.GET_ALL_PRODUCTS);
+    public List<Product> findAll() throws SQLException {
+        List<Product> products = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(Queries.LIST_PRODUCTS);
              ResultSet rs = ps.executeQuery()) {
-            
             while (rs.next()) {
-                products.add(extractProduct(rs));
+                products.add(mapProduct(rs));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return products;
     }
-    
-    public ProductModel getProductById(int productId) {
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.GET_PRODUCT_BY_ID)) {
-            ps.setInt(1, productId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                return extractProduct(rs);
+
+    public Product findById(int id) throws SQLException {
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(Queries.FIND_PRODUCT_BY_ID)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? mapProduct(rs) : null;
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-    
-    public boolean addProduct(ProductModel product) {
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.ADD_PRODUCT)) {
-            ps.setString(1, product.getName());
-            ps.setString(2, product.getDescription());
-            ps.setDouble(3, product.getPrice());
-            ps.setInt(4, product.getStockQuantity());
-            ps.setInt(5, product.getCategoryId());
-            ps.setString(6, product.getManufacturer());
-            ps.setString(7, product.getModelCompatibility());
-            ps.setString(8, product.getImageUrl());
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
         }
     }
-    
-    public boolean updateProduct(ProductModel product) {
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.UPDATE_PRODUCT)) {
-            ps.setString(1, product.getName());
-            ps.setString(2, product.getDescription());
-            ps.setDouble(3, product.getPrice());
-            ps.setInt(4, product.getStockQuantity());
-            ps.setInt(5, product.getCategoryId());
-            ps.setString(6, product.getManufacturer());
-            ps.setString(7, product.getModelCompatibility());
-            ps.setString(8, product.getImageUrl());
-            ps.setInt(9, product.getProductId());
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+
+    public boolean create(Product product) throws SQLException {
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(Queries.INSERT_PRODUCT)) {
+            fillProductStatement(ps, product);
+            return ps.executeUpdate() == 1;
         }
     }
-    
-    public boolean deleteProduct(int productId) {
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.DELETE_PRODUCT)) {
-            ps.setInt(1, productId);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+
+    public boolean update(Product product) throws SQLException {
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(Queries.UPDATE_PRODUCT)) {
+            fillProductStatement(ps, product);
+            ps.setInt(9, product.getId());
+            return ps.executeUpdate() == 1;
         }
     }
-    
-    public List<ProductModel> searchProducts(String keyword) {
-        List<ProductModel> products = new ArrayList<>();
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.SEARCH_PRODUCTS)) {
-            String searchPattern = "%" + keyword.toLowerCase() + "%";
-            ps.setString(1, searchPattern);
-            ps.setString(2, searchPattern);
-            ps.setString(3, searchPattern);
-            ResultSet rs = ps.executeQuery();
+
+    public boolean delete(int id) throws SQLException {
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(Queries.DELETE_PRODUCT)) {
+            ps.setInt(1, id);
+            return ps.executeUpdate() == 1;
+        }
+    }
+
+    public Map<Integer, String> findCategories() throws SQLException {
+        Map<Integer, String> categories = new LinkedHashMap<>();
+        try (Connection con = DBConnection.getConnection();
+             Statement st = con.createStatement();
+             ResultSet rs = st.executeQuery(Queries.LIST_CATEGORIES)) {
             while (rs.next()) {
-                products.add(extractProduct(rs));
+                categories.put(rs.getInt("id"), rs.getString("name"));
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return products;
+        return categories;
     }
-    
-    public List<ProductModel> getProductsByCategory(int categoryId) {
-        List<ProductModel> products = new ArrayList<>();
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.GET_PRODUCTS_BY_CATEGORY)) {
-            ps.setInt(1, categoryId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                products.add(extractProduct(rs));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return products;
+
+    private void fillProductStatement(PreparedStatement ps, Product product) throws SQLException {
+        ps.setInt(1, product.getCategoryId());
+        ps.setString(2, product.getName());
+        ps.setString(3, product.getBrand());
+        ps.setString(4, product.getPartNumber());
+        ps.setString(5, product.getDescription());
+        ps.setBigDecimal(6, product.getPrice());
+        ps.setInt(7, product.getStockQuantity());
+        ps.setString(8, product.getImagePath());
     }
-    
-    public boolean updateStock(int productId, int quantity) {
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.UPDATE_PRODUCT_STOCK)) {
-            ps.setInt(1, quantity);
-            ps.setInt(2, productId);
-            ps.setInt(3, quantity);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
-    public int getTotalProducts() {
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.GET_TOTAL_PRODUCTS);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt("total");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-    
-    private ProductModel extractProduct(ResultSet rs) throws SQLException {
-        ProductModel product = new ProductModel();
-        product.setProductId(rs.getInt("product_id"));
-        product.setName(rs.getString("name"));
-        product.setDescription(rs.getString("description"));
-        product.setPrice(rs.getDouble("price"));
-        product.setStockQuantity(rs.getInt("stock_quantity"));
+
+    private Product mapProduct(ResultSet rs) throws SQLException {
+        Product product = new Product();
+        product.setId(rs.getInt("id"));
         product.setCategoryId(rs.getInt("category_id"));
         product.setCategoryName(rs.getString("category_name"));
-        product.setManufacturer(rs.getString("manufacturer"));
-        product.setModelCompatibility(rs.getString("model_compatibility"));
-        product.setImageUrl(rs.getString("image_url"));
-        product.setCreatedDate(rs.getTimestamp("created_date"));
+        product.setName(rs.getString("name"));
+        product.setBrand(rs.getString("brand"));
+        product.setPartNumber(rs.getString("part_number"));
+        product.setDescription(rs.getString("description"));
+        product.setPrice(rs.getBigDecimal("price"));
+        product.setStockQuantity(rs.getInt("stock_quantity"));
+        product.setImagePath(rs.getString("image_path"));
+        if (rs.getTimestamp("created_at") != null) {
+            product.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
+        }
+        if (rs.getTimestamp("updated_at") != null) {
+            product.setUpdatedAt(rs.getTimestamp("updated_at").toLocalDateTime());
+        }
         return product;
     }
 }

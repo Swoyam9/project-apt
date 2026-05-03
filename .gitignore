@@ -1,4 +1,9 @@
+.DS_Store
 target/
-.settings/
-.classpath
-.project
+tools/
+*.class
+*.war
+*.ear
+*.log
+.metadata/
+bin/

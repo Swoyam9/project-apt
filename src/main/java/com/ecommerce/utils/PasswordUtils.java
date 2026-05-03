@@ -1,14 +1,47 @@
 package com.ecommerce.utils;
 
-import org.mindrot.jbcrypt.BCrypt;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 
-public class PasswordUtils {
-    
-    public static String hashPassword(String plainPassword) {
-        return BCrypt.hashpw(plainPassword, BCrypt.gensalt(12));
+public final class PasswordUtils {
+    private static final SecureRandom RANDOM = new SecureRandom();
+
+    private PasswordUtils() {
     }
-    
-    public static boolean checkPassword(String plainPassword, String hashedPassword) {
-        return BCrypt.checkpw(plainPassword, hashedPassword);
+
+    public static String generateSalt() {
+        byte[] salt = new byte[16];
+        RANDOM.nextBytes(salt);
+        return toHex(salt);
+    }
+
+    public static String hashPassword(String password, String salt) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hashed = digest.digest((salt + password).getBytes(StandardCharsets.UTF_8));
+            return toHex(hashed);
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 is not available", e);
+        }
+    }
+
+    public static boolean verifyPassword(String password, String salt, String expectedHash) {
+        return hashPassword(password, salt).equals(expectedHash);
+    }
+
+    public static String randomToken() {
+        byte[] token = new byte[32];
+        RANDOM.nextBytes(token);
+        return toHex(token);
+    }
+
+    private static String toHex(byte[] bytes) {
+        StringBuilder hex = new StringBuilder();
+        for (byte b : bytes) {
+            hex.append(String.format("%02x", b));
+        }
+        return hex.toString();
     }
 }

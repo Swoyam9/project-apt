@@ -1,93 +1,39 @@
 package com.ecommerce.queries;
 
-public class Queries {
-    
-    // User Queries
-    public static final String CHECK_USER_LOGIN = 
-        "SELECT user_id, email, password, role, active FROM users WHERE email = ?";
-    
-    public static final String GET_USER_BY_EMAIL = 
-        "SELECT * FROM users WHERE email = ?";
-    
-    public static final String REGISTER_USER = 
-        "INSERT INTO users (first_name, last_name, email, password, phone, address, role) VALUES (?, ?, ?, ?, ?, ?, ?)";
-    
-    public static final String CHECK_EMAIL_EXISTS = 
-        "SELECT 1 FROM users WHERE email = ?";
-    
-    public static final String GET_ALL_USERS = 
-        "SELECT * FROM users ORDER BY created_date DESC";
-    
-    public static final String UPDATE_USER_STATUS = 
-        "UPDATE users SET active = ? WHERE user_id = ?";
-    
-    // Product Queries
-    public static final String GET_ALL_PRODUCTS = 
-        "SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.category_id ORDER BY p.created_date DESC";
-    
-    public static final String GET_PRODUCT_BY_ID = 
-        "SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.product_id = ?";
-    
-    public static final String ADD_PRODUCT = 
-        "INSERT INTO products (name, description, price, stock_quantity, category_id, manufacturer, model_compatibility, image_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
-    
-    public static final String UPDATE_PRODUCT = 
-        "UPDATE products SET name=?, description=?, price=?, stock_quantity=?, category_id=?, manufacturer=?, model_compatibility=?, image_url=? WHERE product_id=?";
-    
-    public static final String DELETE_PRODUCT = 
-        "DELETE FROM products WHERE product_id = ?";
-    
-    public static final String SEARCH_PRODUCTS = 
-        "SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE LOWER(p.name) LIKE ? OR LOWER(p.description) LIKE ? OR LOWER(p.manufacturer) LIKE ?";
-    
-    public static final String GET_PRODUCTS_BY_CATEGORY = 
-        "SELECT p.*, c.name as category_name FROM products p LEFT JOIN categories c ON p.category_id = c.category_id WHERE p.category_id = ?";
-    
-    public static final String UPDATE_PRODUCT_STOCK = 
-        "UPDATE products SET stock_quantity = stock_quantity - ? WHERE product_id = ? AND stock_quantity >= ?";
-    
-    // Order Queries
-    public static final String CREATE_ORDER = 
-        "INSERT INTO orders (user_id, total_amount, shipping_address, payment_method, status) VALUES (?, ?, ?, ?, ?)";
-    
-    public static final String ADD_ORDER_ITEM = 
-        "INSERT INTO order_items (order_id, product_id, quantity, price_at_time) VALUES (?, ?, ?, ?)";
-    
-    public static final String GET_USER_ORDERS = 
-        "SELECT * FROM orders WHERE user_id = ? ORDER BY order_date DESC";
-    
-    public static final String GET_ALL_ORDERS = 
-        "SELECT o.*, CONCAT(u.first_name, ' ', u.last_name) as user_name FROM orders o JOIN users u ON o.user_id = u.user_id ORDER BY o.order_date DESC";
-    
-    public static final String GET_ORDER_DETAILS = 
-        "SELECT * FROM orders WHERE order_id = ?";
-    
-    public static final String GET_ORDER_ITEMS = 
-        "SELECT oi.*, p.name as product_name FROM order_items oi JOIN products p ON oi.product_id = p.product_id WHERE oi.order_id = ?";
-    
-    public static final String UPDATE_ORDER_STATUS = 
-        "UPDATE orders SET status = ? WHERE order_id = ?";
-    
-    // Category Queries
-    public static final String GET_ALL_CATEGORIES = 
-        "SELECT * FROM categories";
-    
-    public static final String GET_CATEGORY_BY_ID = 
-        "SELECT * FROM categories WHERE category_id = ?";
-    
-    // Dashboard Queries
-    public static final String GET_TOTAL_PRODUCTS = 
-        "SELECT COUNT(*) as total FROM products";
-    
-    public static final String GET_TOTAL_USERS = 
-        "SELECT COUNT(*) as total FROM users";
-    
-    public static final String GET_TOTAL_ORDERS = 
-        "SELECT COUNT(*) as total FROM orders";
-    
-    public static final String GET_TOTAL_REVENUE = 
-        "SELECT SUM(total_amount) as total FROM orders WHERE status = 'delivered'";
-    
-    public static final String GET_RECENT_ORDERS = 
-        "SELECT o.*, CONCAT(u.first_name, ' ', u.last_name) as user_name FROM orders o JOIN users u ON o.user_id = u.user_id ORDER BY o.order_date DESC LIMIT 5";
+public final class Queries {
+    private Queries() {
+    }
+
+    public static final String INSERT_USER =
+            "INSERT INTO users (full_name, email, phone, address, password_hash, password_salt, role, profile_image) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    public static final String FIND_USER_BY_EMAIL = "SELECT * FROM users WHERE email = ?";
+    public static final String FIND_USER_BY_ID = "SELECT * FROM users WHERE id = ?";
+    public static final String FIND_USER_BY_REMEMBER_TOKEN =
+            "SELECT * FROM users WHERE remember_token = ? AND remember_token_expiry > NOW()";
+    public static final String UPDATE_REMEMBER_TOKEN =
+            "UPDATE users SET remember_token = ?, remember_token_expiry = DATE_ADD(NOW(), INTERVAL 7 DAY) WHERE id = ?";
+    public static final String CLEAR_REMEMBER_TOKEN =
+            "UPDATE users SET remember_token = NULL, remember_token_expiry = NULL WHERE id = ?";
+
+    public static final String LIST_PRODUCTS =
+            "SELECT p.*, c.name AS category_name FROM products p JOIN categories c ON p.category_id = c.id ORDER BY p.id DESC";
+    public static final String FIND_PRODUCT_BY_ID =
+            "SELECT p.*, c.name AS category_name FROM products p JOIN categories c ON p.category_id = c.id WHERE p.id = ?";
+    public static final String INSERT_PRODUCT =
+            "INSERT INTO products (category_id, name, brand, part_number, description, price, stock_quantity, image_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+    public static final String UPDATE_PRODUCT =
+            "UPDATE products SET category_id=?, name=?, brand=?, part_number=?, description=?, price=?, stock_quantity=?, image_path=? WHERE id=?";
+    public static final String DELETE_PRODUCT = "DELETE FROM products WHERE id = ?";
+    public static final String LIST_CATEGORIES = "SELECT * FROM categories ORDER BY name";
+
+    public static final String CREATE_ORDER =
+            "INSERT INTO orders (user_id, total_amount, status, shipping_address) VALUES (?, ?, 'CONFIRMED', ?)";
+    public static final String INSERT_ORDER_ITEM =
+            "INSERT INTO order_items (order_id, product_id, quantity, unit_price) VALUES (?, ?, ?, ?)";
+    public static final String REDUCE_STOCK =
+            "UPDATE products SET stock_quantity = stock_quantity - ? WHERE id = ? AND stock_quantity >= ?";
+    public static final String LIST_ORDERS_BY_USER =
+            "SELECT * FROM orders WHERE user_id = ? ORDER BY order_date DESC";
+    public static final String LIST_ORDER_ITEMS =
+            "SELECT oi.*, p.name AS product_name, p.part_number FROM order_items oi JOIN products p ON oi.product_id = p.id WHERE oi.order_id = ?";
 }

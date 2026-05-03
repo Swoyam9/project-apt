@@ -1,92 +1,83 @@
--- Create Database
-CREATE DATABASE IF NOT EXISTS auto_parts_ecommerce;
-USE auto_parts_ecommerce;
+DROP DATABASE IF EXISTS auto_spare_parts_db;
+CREATE DATABASE auto_spare_parts_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+USE auto_spare_parts_db;
 
--- Users Table
+-- 3NF notes:
+-- users, categories, products, orders, and order_items each store facts about one entity.
+-- order_items resolves the many-to-many relationship between orders and products.
+-- category names are not duplicated in products; product data is not duplicated in orders except unit price snapshot.
+
 CREATE TABLE users (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    phone VARCHAR(20),
-    address TEXT,
-    role ENUM('admin', 'user') DEFAULT 'user',
-    active ENUM('active', 'banned') DEFAULT 'active',
-    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(100) NOT NULL,
+    email VARCHAR(120) NOT NULL UNIQUE,
+    phone VARCHAR(20) NOT NULL,
+    address VARCHAR(255),
+    password_hash VARCHAR(64) NOT NULL,
+    password_salt VARCHAR(64) NOT NULL,
+    role ENUM('USER','ADMIN') NOT NULL DEFAULT 'USER',
+    profile_image VARCHAR(255) DEFAULT 'default-profile.png',
+    remember_token VARCHAR(128),
+    remember_token_expiry DATETIME,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Categories Table
 CREATE TABLE categories (
-    category_id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    image_url VARCHAR(255),
-    price DECIMAL(10,2) DEFAULT 0.00
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(80) NOT NULL UNIQUE,
+    description VARCHAR(255)
 );
 
--- Products Table
 CREATE TABLE products (
-    product_id INT PRIMARY KEY AUTO_INCREMENT,
-    name VARCHAR(200) NOT NULL,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    category_id INT NOT NULL,
+    name VARCHAR(120) NOT NULL,
+    brand VARCHAR(80) NOT NULL,
+    part_number VARCHAR(80) NOT NULL UNIQUE,
     description TEXT,
     price DECIMAL(10,2) NOT NULL,
     stock_quantity INT NOT NULL DEFAULT 0,
-    category_id INT,
-    image_url VARCHAR(255),
-    manufacturer VARCHAR(100),
-    model_compatibility VARCHAR(200),
-    created_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (category_id) REFERENCES categories(category_id)
+    image_path VARCHAR(255) DEFAULT 'default-product.jpg',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_products_category FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
--- Orders Table
 CREATE TABLE orders (
-    order_id INT PRIMARY KEY AUTO_INCREMENT,
-    user_id INT,
-    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
     total_amount DECIMAL(10,2) NOT NULL,
-    status ENUM('pending', 'confirmed', 'shipped', 'delivered', 'cancelled') DEFAULT 'pending',
-    shipping_address TEXT,
-    payment_method VARCHAR(50),
-    FOREIGN KEY (user_id) REFERENCES users(user_id)
+    status ENUM('PENDING','CONFIRMED','SHIPPED','DELIVERED','CANCELLED') NOT NULL DEFAULT 'PENDING',
+    shipping_address VARCHAR(255) NOT NULL,
+    order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_orders_user FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
--- Order Items Table
 CREATE TABLE order_items (
-    order_item_id INT PRIMARY KEY AUTO_INCREMENT,
-    order_id INT,
-    product_id INT,
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    order_id INT NOT NULL,
+    product_id INT NOT NULL,
     quantity INT NOT NULL,
-    price_at_time DECIMAL(10,2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES orders(order_id),
-    FOREIGN KEY (product_id) REFERENCES products(product_id)
+    unit_price DECIMAL(10,2) NOT NULL,
+    CONSTRAINT fk_order_items_order FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE,
+    CONSTRAINT fk_order_items_product FOREIGN KEY (product_id) REFERENCES products(id)
 );
 
--- Insert Categories
-INSERT INTO categories (name, description, price) VALUES
-('Engine Parts', 'Engine components and spare parts', 0),
-('Brake System', 'Brake pads, rotors, and calipers', 0),
-('Electrical System', 'Batteries, alternators, and wiring', 0),
-('Suspension', 'Shocks, struts, and control arms', 0),
-('Transmission', 'Gearboxes and transmission parts', 0),
-('Exhaust System', 'Mufflers and exhaust pipes', 0),
-('Cooling System', 'Radiators and cooling fans', 0),
-('Lighting', 'Headlights and taillights', 0);
+INSERT INTO categories (name, description) VALUES
+('Engine Parts', 'Filters, plugs, belts, pistons and engine maintenance items'),
+('Brake System', 'Brake pads, rotors, calipers and brake accessories'),
+('Electrical', 'Batteries, bulbs, sensors and wiring components'),
+('Suspension', 'Shock absorbers, struts and control arms'),
+('Body Parts', 'Mirrors, bumpers, handles and exterior fittings');
 
--- Insert Admin User (password: admin123)
-INSERT INTO users (first_name, last_name, email, password, role) VALUES
-('Admin', 'User', 'admin@autoparts.com', '$2a$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewKyYr.pYyVK9rMq', 'admin');
+-- Default admin password: admin123
+INSERT INTO users (full_name, email, phone, address, password_hash, password_salt, role)
+VALUES ('System Admin', 'admin@autospares.com', '9800000000', 'Admin Office',
+'9f9ac2847ba95b9f4db9813c3fde37ffeb707e72cf2bbf4b585fd5af973d10e5', 'autospares-admin-salt', 'ADMIN');
 
--- Insert Sample Products
-INSERT INTO products (name, description, price, stock_quantity, category_id, manufacturer, model_compatibility) VALUES
-('Premium Brake Pad Set', 'Ceramic brake pads for superior stopping power', 45.99, 100, 2, 'Bosch', 'Universal Fit'),
-('Oil Filter', 'High efficiency oil filter for engine protection', 12.99, 200, 1, 'Fram', 'Most Vehicles'),
-('Car Battery', '12V maintenance-free battery', 129.99, 50, 3, 'Exide', 'Universal'),
-('Spark Plug Set', 'Iridium spark plugs for better performance', 24.99, 150, 1, 'NGK', 'Most Vehicles'),
-('Brake Rotor', 'Premium drilled brake rotor', 89.99, 75, 2, 'Brembo', 'Universal'),
-('Alternator', 'High output alternator', 199.99, 30, 3, 'Denso', 'Multiple Models'),
-('Shock Absorber', 'Heavy duty shock absorber', 119.99, 60, 4, 'Bilstein', 'SUV/Truck'),
-('Clutch Kit', 'Complete clutch replacement kit', 299.99, 25, 5, 'Exedy', 'Various Models'),
-('Radiator', 'Aluminum racing radiator', 179.99, 40, 7, 'Mishimoto', 'Universal'),
-('LED Headlight Kit', 'Bright LED headlight conversion', 79.99, 100, 8, 'Philips', 'Universal');
+INSERT INTO products (category_id, name, brand, part_number, description, price, stock_quantity, image_path) VALUES
+(1, 'Premium Oil Filter', 'Bosch', 'BOS-OF-1001', 'High-efficiency oil filter for petrol engines.', 14.99, 45, 'oil-filter.jpg'),
+(2, 'Ceramic Brake Pads', 'Brembo', 'BRM-BP-2201', 'Low-dust ceramic brake pad set for front wheels.', 59.50, 28, 'brake-pads.jpg'),
+(3, '12V Car Battery', 'Exide', 'EXD-BAT-450', 'Reliable 12V battery with strong cold start performance.', 129.99, 12, 'battery.jpg'),
+(4, 'Gas Shock Absorber', 'Monroe', 'MON-SHOCK-300', 'Rear gas shock absorber for smooth ride control.', 74.25, 20, 'shock-absorber.jpg'),
+(5, 'Side Mirror Assembly', 'Dorman', 'DOR-MIR-991', 'Manual side mirror replacement assembly.', 38.75, 16, 'side-mirror.jpg');

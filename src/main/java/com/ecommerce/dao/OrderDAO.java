@@ -1,184 +1,123 @@
 package com.ecommerce.dao;
 
-import com.ecommerce.models.OrderModel;
-import com.ecommerce.models.OrderItemModel;
-import com.ecommerce.utils.DatabaseConn;
+import com.ecommerce.models.CartItem;
+import com.ecommerce.models.Order;
+import com.ecommerce.models.OrderItem;
 import com.ecommerce.queries.Queries;
+import com.ecommerce.utils.DBConnection;
 
-import java.sql.*;
+import java.math.BigDecimal;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
 public class OrderDAO {
-    
-    public int createOrder(OrderModel order) {
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.CREATE_ORDER, Statement.RETURN_GENERATED_KEYS)) {
-            
-            ps.setInt(1, order.getUserId());
-            ps.setDouble(2, order.getTotalAmount());
-            ps.setString(3, order.getShippingAddress());
-            ps.setString(4, order.getPaymentMethod());
-            ps.setString(5, order.getStatus());
-            
-            ps.executeUpdate();
-            ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) {
-                return rs.getInt(1);
+    public int createOrder(int userId, String shippingAddress, List<CartItem> cartItems) throws SQLException {
+        if (cartItems == null || cartItems.isEmpty()) {
+            throw new SQLException("Cart is empty");
+        }
+
+        BigDecimal total = cartItems.stream()
+                .map(CartItem::getSubtotal)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        try (Connection con = DBConnection.getConnection()) {
+            con.setAutoCommit(false);
+            try (PreparedStatement orderPs = con.prepareStatement(Queries.CREATE_ORDER, Statement.RETURN_GENERATED_KEYS)) {
+                orderPs.setInt(1, userId);
+                orderPs.setBigDecimal(2, total);
+                orderPs.setString(3, shippingAddress);
+                orderPs.executeUpdate();
+
+                int orderId;
+                try (ResultSet keys = orderPs.getGeneratedKeys()) {
+                    if (!keys.next()) {
+                        throw new SQLException("Could not create order");
+                    }
+                    orderId = keys.getInt(1);
+                }
+
+                for (CartItem item : cartItems) {
+                    reduceStock(con, item);
+                    insertOrderItem(con, orderId, item);
+                }
+
+                con.commit();
+                return orderId;
+            } catch (SQLException e) {
+                con.rollback();
+                throw e;
+            } finally {
+                con.setAutoCommit(true);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return -1;
-    }
-    
-    public boolean addOrderItem(OrderItemModel item) {
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.ADD_ORDER_ITEM)) {
-            ps.setInt(1, item.getOrderId());
-            ps.setInt(2, item.getProductId());
-            ps.setInt(3, item.getQuantity());
-            ps.setDouble(4, item.getPriceAtTime());
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
         }
     }
-    
-    public List<OrderModel> getOrdersByUser(int userId) {
-        List<OrderModel> orders = new ArrayList<>();
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.GET_USER_ORDERS)) {
+
+    public List<Order> findByUser(int userId) throws SQLException {
+        List<Order> orders = new ArrayList<>();
+        try (Connection con = DBConnection.getConnection();
+             PreparedStatement ps = con.prepareStatement(Queries.LIST_ORDERS_BY_USER)) {
             ps.setInt(1, userId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                orders.add(extractOrder(rs));
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Order order = new Order();
+                    order.setId(rs.getInt("id"));
+                    order.setUserId(rs.getInt("user_id"));
+                    order.setTotalAmount(rs.getBigDecimal("total_amount"));
+                    order.setStatus(rs.getString("status"));
+                    order.setShippingAddress(rs.getString("shipping_address"));
+                    order.setOrderDate(rs.getTimestamp("order_date").toLocalDateTime());
+                    order.setItems(findItems(con, order.getId()));
+                    orders.add(order);
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return orders;
     }
-    
-    public List<OrderModel> getAllOrders() {
-        List<OrderModel> orders = new ArrayList<>();
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.GET_ALL_ORDERS);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                OrderModel order = extractOrder(rs);
-                order.setUserName(rs.getString("user_name"));
-                orders.add(order);
+
+    private void reduceStock(Connection con, CartItem item) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement(Queries.REDUCE_STOCK)) {
+            ps.setInt(1, item.getQuantity());
+            ps.setInt(2, item.getProduct().getId());
+            ps.setInt(3, item.getQuantity());
+            if (ps.executeUpdate() != 1) {
+                throw new SQLException("Insufficient stock for " + item.getProduct().getName());
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-        return orders;
     }
-    
-    public OrderModel getOrderDetails(int orderId) {
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.GET_ORDER_DETAILS)) {
+
+    private void insertOrderItem(Connection con, int orderId, CartItem item) throws SQLException {
+        try (PreparedStatement ps = con.prepareStatement(Queries.INSERT_ORDER_ITEM)) {
             ps.setInt(1, orderId);
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                OrderModel order = extractOrder(rs);
-                order.setItems(getOrderItems(orderId));
-                return order;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+            ps.setInt(2, item.getProduct().getId());
+            ps.setInt(3, item.getQuantity());
+            ps.setBigDecimal(4, item.getProduct().getPrice());
+            ps.executeUpdate();
         }
-        return null;
     }
-    
-    public List<OrderItemModel> getOrderItems(int orderId) {
-        List<OrderItemModel> items = new ArrayList<>();
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.GET_ORDER_ITEMS)) {
+
+    private List<OrderItem> findItems(Connection con, int orderId) throws SQLException {
+        List<OrderItem> items = new ArrayList<>();
+        try (PreparedStatement ps = con.prepareStatement(Queries.LIST_ORDER_ITEMS)) {
             ps.setInt(1, orderId);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                OrderItemModel item = new OrderItemModel();
-                item.setOrderItemId(rs.getInt("order_item_id"));
-                item.setOrderId(rs.getInt("order_id"));
-                item.setProductId(rs.getInt("product_id"));
-                item.setProductName(rs.getString("product_name"));
-                item.setQuantity(rs.getInt("quantity"));
-                item.setPriceAtTime(rs.getDouble("price_at_time"));
-                items.add(item);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    OrderItem item = new OrderItem();
+                    item.setId(rs.getInt("id"));
+                    item.setOrderId(rs.getInt("order_id"));
+                    item.setProductId(rs.getInt("product_id"));
+                    item.setProductName(rs.getString("product_name"));
+                    item.setPartNumber(rs.getString("part_number"));
+                    item.setQuantity(rs.getInt("quantity"));
+                    item.setUnitPrice(rs.getBigDecimal("unit_price"));
+                    items.add(item);
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
         }
         return items;
-    }
-    
-    public boolean updateOrderStatus(int orderId, String status) {
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.UPDATE_ORDER_STATUS)) {
-            ps.setString(1, status);
-            ps.setInt(2, orderId);
-            return ps.executeUpdate() > 0;
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-    }
-    
-    public int getTotalOrders() {
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.GET_TOTAL_ORDERS);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt("total");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-    
-    public double getTotalRevenue() {
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.GET_TOTAL_REVENUE);
-             ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getDouble("total");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return 0;
-    }
-    
-    public List<OrderModel> getRecentOrders(int limit) {
-        List<OrderModel> orders = new ArrayList<>();
-        try (Connection conn = DatabaseConn.getConnection();
-             PreparedStatement ps = conn.prepareStatement(Queries.GET_RECENT_ORDERS)) {
-            ps.setInt(1, limit);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                OrderModel order = extractOrder(rs);
-                order.setUserName(rs.getString("user_name"));
-                orders.add(order);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return orders;
-    }
-    
-    private OrderModel extractOrder(ResultSet rs) throws SQLException {
-        OrderModel order = new OrderModel();
-        order.setOrderId(rs.getInt("order_id"));
-        order.setUserId(rs.getInt("user_id"));
-        order.setOrderDate(rs.getTimestamp("order_date"));
-        order.setTotalAmount(rs.getDouble("total_amount"));
-        order.setStatus(rs.getString("status"));
-        order.setShippingAddress(rs.getString("shipping_address"));
-        order.setPaymentMethod(rs.getString("payment_method"));
-        return order;
     }
 }

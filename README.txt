@@ -1,0 +1,49 @@
+Automobile Spare Parts Ecommerce
+================================
+
+Technology:
+- JSP + Servlet MVC
+- MySQL
+- Maven WAR
+- JSTL
+
+Setup:
+1. Create the database by running:
+   mysql -u root -p < src/main/resources/database.sql
+
+2. Configure database credentials if needed:
+   DB_URL=jdbc:mysql://localhost:3306/auto_spare_parts_db?useSSL=false&serverTimezone=UTC
+   DB_USER=root
+   DB_PASSWORD=your_password
+
+3. Build:
+   mvn clean package
+
+4. Deploy target/AutomobileSparePartsEcommerce.war to Tomcat 9.
+
+Local Tomcat installed for Eclipse:
+- /Users/swoyampradhan/Documents/Codex/2026-05-03/i-need-to-create-a-complete/AutomobileSparePartsEcommerce/tools/apache-tomcat-9.0.117
+
+In Eclipse, use this folder when adding:
+- Servers -> New -> Apache -> Tomcat v9.0 Server -> Tomcat installation directory
+
+Default admin:
+- Email: admin@autospares.com
+- Password: admin123
+
+MVC packages:
+- com.ecommerce.controller: Servlet controllers
+- com.ecommerce.dao: JDBC database access
+- com.ecommerce.models: Entity/model classes
+- com.ecommerce.utils: DB, password, and validation utilities
+- com.ecommerce.filter: Authentication and role filter
+- WEB-INF/views: JSP screens
+
+Coursework coverage:
+- UI prototype in JSP/CSS
+- Wireframe/prototype notes in docs/WIREFRAME.md
+- 3NF schema in database.sql and ERD in docs/ERD.md
+- Registration, login, salted SHA-256 password hashing, session handling, auth filter, remember-me cookie
+- Profile image upload and product image upload
+- Admin product CRUD
+- User product catalog, cart, checkout, and order history
