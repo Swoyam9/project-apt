@@ -28,7 +28,7 @@
                     <div class="product-image">${product.categoryName}</div>
                     <h3>${product.name}</h3>
                     <p>${product.brand} · ${product.partNumber}</p>
-                    <strong>$<fmt:formatNumber value="${product.price}" minFractionDigits="2"/></strong>
+                    <strong>Nrs <fmt:formatNumber value="${product.price}" minFractionDigits="2"/></strong>
                     <form method="post" action="${pageContext.request.contextPath}/cart/add">
                         <input type="hidden" name="productId" value="${product.id}">
                         <input type="hidden" name="quantity" value="1">

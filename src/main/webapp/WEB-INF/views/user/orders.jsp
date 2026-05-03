@@ -29,12 +29,12 @@
                             <tr>
                                 <td>${item.productName}<br><span class="muted">${item.partNumber}</span></td>
                                 <td>${item.quantity}</td>
-                                <td>$<fmt:formatNumber value="${item.subtotal}" minFractionDigits="2"/></td>
+                                <td>Nrs <fmt:formatNumber value="${item.subtotal}" minFractionDigits="2"/></td>
                             </tr>
                         </c:forEach>
                         </tbody>
                     </table>
-                    <strong>Total: $<fmt:formatNumber value="${order.totalAmount}" minFractionDigits="2"/></strong>
+                    <strong>Total: Nrs <fmt:formatNumber value="${order.totalAmount}" minFractionDigits="2"/></strong>
                 </article>
             </c:forEach>
         </c:otherwise>

@@ -22,7 +22,7 @@
                 <h3>${product.name}</h3>
                 <p>${product.description}</p>
                 <p class="muted">${product.brand} · ${product.partNumber}</p>
-                <strong>$<fmt:formatNumber value="${product.price}" minFractionDigits="2"/></strong>
+                <strong>Nrs <fmt:formatNumber value="${product.price}" minFractionDigits="2"/></strong>
                 <span class="stock">${product.stockQuantity} in stock</span>
                 <form method="post" action="${pageContext.request.contextPath}/cart/add" class="inline-form">
                     <input type="hidden" name="productId" value="${product.id}">

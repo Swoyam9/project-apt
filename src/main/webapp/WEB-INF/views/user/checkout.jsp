@@ -11,7 +11,7 @@
 <main class="auth-shell">
     <section class="auth-card">
         <h1>Checkout</h1>
-        <p class="summary">Order total: <strong>$<fmt:formatNumber value="${total}" minFractionDigits="2"/></strong></p>
+        <p class="summary">Order total: <strong>Nrs <fmt:formatNumber value="${total}" minFractionDigits="2"/></strong></p>
         <form method="post" action="${pageContext.request.contextPath}/order/place" class="form">
             <label>Shipping address
                 <textarea name="shippingAddress" rows="4" required>${defaultAddress}</textarea>

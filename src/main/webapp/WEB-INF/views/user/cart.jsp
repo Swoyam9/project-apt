@@ -28,14 +28,14 @@
                     <tr>
                         <td>${item.product.name}</td>
                         <td>${item.quantity}</td>
-                        <td>$<fmt:formatNumber value="${item.product.price}" minFractionDigits="2"/></td>
-                        <td>$<fmt:formatNumber value="${item.subtotal}" minFractionDigits="2"/></td>
+                        <td>Nrs <fmt:formatNumber value="${item.product.price}" minFractionDigits="2"/></td>
+                        <td>Nrs <fmt:formatNumber value="${item.subtotal}" minFractionDigits="2"/></td>
                     </tr>
                 </c:forEach>
                 </tbody>
             </table>
             <div class="total-row">
-                <strong>Total: $<fmt:formatNumber value="${total}" minFractionDigits="2"/></strong>
+                <strong>Total: Nrs <fmt:formatNumber value="${total}" minFractionDigits="2"/></strong>
                 <a class="button" href="${pageContext.request.contextPath}/checkout">Checkout</a>
             </div>
         </c:otherwise>

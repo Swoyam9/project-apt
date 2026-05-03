@@ -26,7 +26,7 @@
                 <td><strong>${product.name}</strong><br><span class="muted">${product.brand}</span></td>
                 <td>${product.categoryName}</td>
                 <td>${product.partNumber}</td>
-                <td>$<fmt:formatNumber value="${product.price}" minFractionDigits="2"/></td>
+                <td>Nrs <fmt:formatNumber value="${product.price}" minFractionDigits="2"/></td>
                 <td>${product.stockQuantity}</td>
                 <td class="actions">
                     <a class="button ghost small" href="${pageContext.request.contextPath}/admin/products/edit?id=${product.id}">Edit</a>
