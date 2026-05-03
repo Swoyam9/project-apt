@@ -1,9 +1,8 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="isLoginPage" value="${pageContext.request.servletPath eq '/login'}"/>
 <header class="site-header">
     <a class="brand" href="${pageContext.request.contextPath}/home">AutoSpares</a>
     <nav class="nav">
-        <c:if test="${not isLoginPage}">
+        <c:if test="${not hideLoginNav}">
             <a href="${pageContext.request.contextPath}/products">Products</a>
         </c:if>
         <c:if test="${not empty sessionScope.authUser && sessionScope.authUser.role eq 'ADMIN'}">
@@ -16,7 +15,7 @@
             <a href="${pageContext.request.contextPath}/logout">Logout</a>
         </c:if>
         <c:if test="${empty sessionScope.authUser}">
-            <c:if test="${not isLoginPage}">
+            <c:if test="${not hideLoginNav}">
                 <a href="${pageContext.request.contextPath}/login">Login</a>
             </c:if>
             <a class="button small" href="${pageContext.request.contextPath}/register">Register</a>

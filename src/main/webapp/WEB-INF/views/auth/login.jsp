@@ -1,4 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -6,6 +7,7 @@
     <link rel="stylesheet" href="${pageContext.request.contextPath}/css/style.css">
 </head>
 <body>
+<c:set var="hideLoginNav" value="true" scope="request"/>
 <jsp:include page="/components/header.jsp"/>
 <main class="auth-shell">
     <section class="auth-card">
