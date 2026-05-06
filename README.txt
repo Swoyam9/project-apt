@@ -8,18 +8,30 @@ Technology:
 - JSTL
 
 Setup:
-1. Create the database by running:
-   mysql -u root -p < src/main/resources/database.sql
+1. Start the local database after every PC restart:
+   sh scripts/start-local-database.sh
 
 2. Configure database credentials if needed:
    DB_URL=jdbc:mysql://localhost:3306/auto_spare_parts_db?useSSL=false&serverTimezone=UTC
    DB_USER=root
    DB_PASSWORD=your_password
 
-3. Build:
+3. In Eclipse:
+   Import -> Existing Maven Projects -> select this project
+   Right click project -> Maven -> Update Project
+
+4. Add Tomcat 9 in Eclipse:
+   Window -> Show View -> Servers
+   New Server -> Apache -> Tomcat v9.0 Server
+
+5. Run:
+   Right click project -> Run As -> Run on Server
+
+Build manually if needed:
    mvn clean package
 
-4. Deploy target/AutomobileSparePartsEcommerce.war to Tomcat 9.
+Stop local database:
+   sh scripts/stop-local-database.sh
 
 Default admin:
 - Email: admin@autospares.com
