@@ -27,6 +27,11 @@ Setup:
 5. Run:
    Right click project -> Run As -> Run on Server
 
+If login shows "MySQL JDBC driver not found":
+   Right click project -> Refresh
+   Right click project -> Maven -> Update Project
+   Clean and restart the Tomcat server in Eclipse
+
 Build manually if needed:
    mvn clean package
 
