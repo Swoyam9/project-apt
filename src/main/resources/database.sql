@@ -76,8 +76,8 @@ VALUES ('System Admin', 'admin@autospares.com', '9800000000', 'Admin Office',
 '9f9ac2847ba95b9f4db9813c3fde37ffeb707e72cf2bbf4b585fd5af973d10e5', 'autospares-admin-salt', 'ADMIN');
 
 INSERT INTO products (category_id, name, brand, part_number, description, price, stock_quantity, image_path) VALUES
-(1, 'Premium Oil Filter', 'Bosch', 'BOS-OF-1001', 'High-efficiency oil filter for petrol engines.', 14.99, 45, 'oil-filter.jpg'),
-(2, 'Ceramic Brake Pads', 'Brembo', 'BRM-BP-2201', 'Low-dust ceramic brake pad set for front wheels.', 59.50, 28, 'brake-pads.jpg'),
-(3, '12V Car Battery', 'Exide', 'EXD-BAT-450', 'Reliable 12V battery with strong cold start performance.', 129.99, 12, 'battery.jpg'),
-(4, 'Gas Shock Absorber', 'Monroe', 'MON-SHOCK-300', 'Rear gas shock absorber for smooth ride control.', 74.25, 20, 'shock-absorber.jpg'),
-(5, 'Side Mirror Assembly', 'Dorman', 'DOR-MIR-991', 'Manual side mirror replacement assembly.', 38.75, 16, 'side-mirror.jpg');
+(1, 'Premium Oil Filter', 'Bosch', 'BOS-OF-1001', 'High-efficiency oil filter for petrol engines.', 1500.00, 45, 'engine-filter.jpg'),
+(2, 'Ceramic Brake Pads', 'Brembo', 'BRM-BP-2201', 'Low-dust ceramic brake pad set for front wheels.', 5950.00, 28, 'brake-pads.jpg'),
+(3, '12V Car Battery', 'Exide', 'EXD-BAT-450', 'Reliable 12V battery with strong cold start performance.', 12999.00, 12, 'battery.jpg'),
+(4, 'Gas Shock Absorber', 'Monroe', 'MON-SHOCK-300', 'Rear gas shock absorber for smooth ride control.', 7425.00, 20, 'shock-absorber.png'),
+(5, 'Side Mirror Assembly', 'Dorman', 'DOR-MIR-991', 'Manual side mirror replacement assembly.', 3875.00, 16, 'side-mirror.jpg');
