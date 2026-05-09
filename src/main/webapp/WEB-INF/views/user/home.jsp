@@ -25,7 +25,15 @@
         <div class="product-grid">
             <c:forEach var="product" items="${products}" end="5">
                 <article class="product-card">
-                    <div class="product-image">${product.categoryName}</div>
+                    <c:set var="productImage" value="default-part.svg"/>
+                    <c:if test="${product.categoryName eq 'Engine Parts'}"><c:set var="productImage" value="engine-filter.svg"/></c:if>
+                    <c:if test="${product.categoryName eq 'Brake System'}"><c:set var="productImage" value="brake-pads.svg"/></c:if>
+                    <c:if test="${product.categoryName eq 'Electrical'}"><c:set var="productImage" value="battery.svg"/></c:if>
+                    <c:if test="${product.categoryName eq 'Suspension'}"><c:set var="productImage" value="shock-absorber.svg"/></c:if>
+                    <c:if test="${product.categoryName eq 'Body Parts'}"><c:set var="productImage" value="side-mirror.svg"/></c:if>
+                    <div class="product-image">
+                        <img src="${pageContext.request.contextPath}/images/products/${productImage}" alt="${product.name}">
+                    </div>
                     <h3>${product.name}</h3>
                     <p>${product.brand} · ${product.partNumber}</p>
                     <strong>Nrs <fmt:formatNumber value="${product.price}" minFractionDigits="2"/></strong>

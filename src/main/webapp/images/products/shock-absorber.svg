@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 260" role="img" aria-label="Shock absorber">
+  <rect width="420" height="260" rx="18" fill="#f6f7f1"/>
+  <g transform="translate(126 34) rotate(-18 84 96)">
+    <rect x="70" y="8" width="28" height="176" rx="14" fill="#243447"/>
+    <rect x="53" y="52" width="62" height="100" rx="18" fill="#0f766e"/>
+    <path d="M48 42c58 16 78 34 72 56s-40 30-78 42" fill="none" stroke="#efb84a" stroke-width="10" stroke-linecap="round"/>
+    <circle cx="84" cy="14" r="22" fill="#f8faf9" stroke="#243447" stroke-width="8"/>
+    <circle cx="84" cy="186" r="24" fill="#f8faf9" stroke="#243447" stroke-width="8"/>
+  </g>
+</svg>

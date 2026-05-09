@@ -3,11 +3,12 @@
     --muted: #64707d;
     --line: #d9e1e8;
     --panel: #ffffff;
-    --wash: #f3f6f8;
+    --wash: #eef4f3;
     --accent: #0f766e;
     --accent-dark: #0b5f59;
     --danger: #b42318;
     --success: #137333;
+    --gold: #efb84a;
 }
 
 * {
@@ -18,7 +19,9 @@ body {
     margin: 0;
     font-family: Arial, Helvetica, sans-serif;
     color: var(--ink);
-    background: var(--wash);
+    background:
+        radial-gradient(circle at top left, rgba(15, 118, 110, .12), transparent 28rem),
+        linear-gradient(180deg, #f8fbfa, var(--wash));
     line-height: 1.5;
 }
 
@@ -33,7 +36,8 @@ a {
     justify-content: space-between;
     gap: 24px;
     padding: 16px clamp(18px, 4vw, 48px);
-    background: var(--panel);
+    background: rgba(255, 255, 255, .94);
+    backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
     position: sticky;
     top: 0;
@@ -100,8 +104,8 @@ a {
 
 .product-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 18px;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 22px;
 }
 
 .product-card,
@@ -114,15 +118,36 @@ a {
     padding: 18px;
 }
 
-.product-image {
-    min-height: 128px;
-    border-radius: 6px;
+.product-card {
     display: grid;
-    place-items: center;
-    background: linear-gradient(135deg, #d7ece8, #eef3f6);
-    color: var(--accent-dark);
-    font-weight: 700;
+    align-content: start;
+    gap: 8px;
+    box-shadow: 0 16px 40px rgba(29, 37, 44, .08);
+    transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 22px 52px rgba(29, 37, 44, .13);
+}
+
+.product-image {
+    height: 158px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background:
+        linear-gradient(135deg, rgba(15, 118, 110, .12), rgba(239, 184, 74, .14)),
+        #f8fbfa;
     margin-bottom: 14px;
+    overflow: hidden;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .stock,
@@ -142,8 +167,16 @@ a {
     padding: 32px 16px;
 }
 
+.login-page {
+    background:
+        linear-gradient(135deg, rgba(15, 118, 110, .13), rgba(239, 184, 74, .16)),
+        url("../images/products/engine-filter.svg") left 9% bottom 12% / 210px auto no-repeat,
+        url("../images/products/brake-pads.svg") right 9% top 18% / 210px auto no-repeat;
+}
+
 .auth-card {
     width: min(460px, 100%);
+    box-shadow: 0 22px 60px rgba(29, 37, 44, .12);
 }
 
 .auth-card.wide {
@@ -153,6 +186,48 @@ a {
 .form {
     display: grid;
     gap: 14px;
+}
+
+.form-eyebrow {
+    color: var(--accent);
+    margin: 0;
+}
+
+.login-switch {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 6px;
+    background: #eef3f6;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+}
+
+.login-switch label {
+    display: block;
+    cursor: pointer;
+}
+
+.login-switch input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.login-switch span {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 40px;
+    border-radius: 6px;
+    color: var(--muted);
+    font-weight: 800;
+}
+
+.login-switch input:checked + span {
+    background: var(--accent);
+    color: white;
+    box-shadow: 0 8px 18px rgba(15, 118, 110, .25);
 }
 
 .grid-form {
