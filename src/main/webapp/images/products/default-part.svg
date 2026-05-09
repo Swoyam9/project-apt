@@ -1,8 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 260" role="img" aria-label="Spare part">
-  <rect width="420" height="260" rx="18" fill="#f3f6f8"/>
-  <g transform="translate(128 52)">
-    <circle cx="82" cy="78" r="62" fill="#0f766e"/>
-    <circle cx="82" cy="78" r="28" fill="#f3f6f8"/>
-    <path d="M82 0v28M82 128v28M4 78h28M132 78h28M28 24l20 20M116 112l20 20M136 24l-20 20M48 112l-20 20" stroke="#243447" stroke-width="16" stroke-linecap="round"/>
-  </g>
-</svg>

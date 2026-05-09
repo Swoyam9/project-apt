@@ -170,8 +170,8 @@ a {
 .login-page {
     background:
         linear-gradient(135deg, rgba(15, 118, 110, .13), rgba(239, 184, 74, .16)),
-        url("../images/products/engine-filter.svg") left 9% bottom 12% / 210px auto no-repeat,
-        url("../images/products/brake-pads.svg") right 9% top 18% / 210px auto no-repeat;
+        url("../images/products/engine-filter.jpg") left 9% bottom 12% / 210px auto no-repeat,
+        url("../images/products/brake-pads.jpg") right 9% top 18% / 210px auto no-repeat;
 }
 
 .auth-card {

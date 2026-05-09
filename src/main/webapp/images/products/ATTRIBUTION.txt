@@ -1,0 +1,23 @@
+Product image sources
+=====================
+
+These are real product/automobile part images downloaded from Wikimedia Commons
+using web image search results.
+
+engine-filter.jpg
+- Source: Wikimedia Commons, File:Engine oil filter.JPG
+
+brake-pads.jpg
+- Source: Wikimedia Commons, File:Brake pads.JPG
+
+battery.jpg
+- Source: Wikimedia Commons, File:Car battery.jpg
+
+shock-absorber.png
+- Source: Wikimedia Commons, File:Shock absorber.png
+
+side-mirror.jpg
+- Source: Wikimedia Commons, File:Side-view mirror Saab 9-5.JPG
+
+default-part.jpg
+- Source: Wikimedia Commons, File:Auto parts.jpg

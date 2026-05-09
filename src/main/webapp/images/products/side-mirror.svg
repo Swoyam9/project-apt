@@ -1,7 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 260" role="img" aria-label="Side mirror">
-  <rect width="420" height="260" rx="18" fill="#f5f3f0"/>
-  <path d="M88 156c70-76 152-92 244-48 8 4 12 13 8 22-18 45-62 70-126 70-52 0-94-10-126-30-6-4-6-10 0-14z" fill="#243447"/>
-  <path d="M123 151c58-48 118-59 184-31-18 28-50 42-96 42-34 0-63-4-88-11z" fill="#cde6ef"/>
-  <path d="M214 196c9 24 27 37 56 40" fill="none" stroke="#243447" stroke-width="18" stroke-linecap="round"/>
-  <path d="M132 145c40-31 88-40 144-24" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity=".8"/>
-</svg>
