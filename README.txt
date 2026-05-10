@@ -8,23 +8,29 @@ Technology:
 - JSTL
 
 Setup:
-1. Start the local database after every PC restart:
-   sh scripts/start-local-database.sh
+1. Start XAMPP MySQL.
 
-2. Configure database credentials if needed:
+2. In phpMyAdmin, import the database if tables are missing:
+   src/main/resources/xampp_phpmyadmin_restore.sql
+
+   If you are creating the database for the first time, this file will create
+   auto_spare_parts_db and add the users, categories, products, orders, and
+   order_items tables.
+
+3. Configure database credentials if needed:
    DB_URL=jdbc:mysql://localhost:3306/auto_spare_parts_db?useSSL=false&serverTimezone=UTC
    DB_USER=root
    DB_PASSWORD=your_password
 
-3. In Eclipse:
+4. In Eclipse:
    Import -> Existing Maven Projects -> select this project
    Right click project -> Maven -> Update Project
 
-4. Add Tomcat 9 in Eclipse:
+5. Add Tomcat 9 in Eclipse:
    Window -> Show View -> Servers
    New Server -> Apache -> Tomcat v9.0 Server
 
-5. Run:
+6. Run:
    Right click project -> Run As -> Run on Server
 
 If login shows "MySQL JDBC driver not found":
@@ -34,6 +40,9 @@ If login shows "MySQL JDBC driver not found":
 
 Build manually if needed:
    mvn clean package
+
+Optional project-local database:
+   sh scripts/start-local-database.sh
 
 Stop local database:
    sh scripts/stop-local-database.sh
@@ -55,6 +64,7 @@ Coursework coverage:
 - Wireframe/prototype notes in docs/WIREFRAME.md
 - 3NF schema in database.sql and ERD in docs/ERD.md
 - Extra XAMPP table script in src/main/resources/xampp_required_tables.sql
+- phpMyAdmin restore script in src/main/resources/xampp_phpmyadmin_restore.sql
 - Registration, login, salted SHA-256 password hashing, session handling, auth filter, remember-me cookie
 - Profile image upload and product image upload
 - Admin product CRUD
