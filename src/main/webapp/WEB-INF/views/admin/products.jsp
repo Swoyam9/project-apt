@@ -30,7 +30,7 @@
                 <td>${product.stockQuantity}</td>
                 <td class="actions">
                     <a class="button ghost small" href="${pageContext.request.contextPath}/admin/products/edit?id=${product.id}">Edit</a>
-                    <form method="post" action="${pageContext.request.contextPath}/admin/products/delete" data-confirm="Delete this product?">
+                    <form method="post" action="${pageContext.request.contextPath}/admin/products/delete">
                         <input type="hidden" name="id" value="${product.id}">
                         <button class="button danger small" type="submit">Delete</button>
                     </form>
@@ -42,7 +42,6 @@
 <c:if test="${empty param.embedded}">
 </main>
 <jsp:include page="/components/footer.jsp"/>
-<script src="${pageContext.request.contextPath}/js/script.js"></script>
 </body>
 </html>
 </c:if>
