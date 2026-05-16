@@ -2,7 +2,7 @@ Automobile Spare Parts Ecommerce
 ================================
 
 Technology:
-- JSP + Servlet MVC
+- JSP + Jakarta Servlet MVC
 - MySQL
 - Maven WAR
 - JSTL
@@ -26,9 +26,9 @@ Setup:
    Import -> Existing Maven Projects -> select this project
    Right click project -> Maven -> Update Project
 
-5. Add Tomcat 9 in Eclipse:
+5. Add Tomcat 10 in Eclipse:
    Window -> Show View -> Servers
-   New Server -> Apache -> Tomcat v9.0 Server
+   New Server -> Apache -> Tomcat v10.1 Server
 
 6. Run:
    Right click project -> Run As -> Run on Server

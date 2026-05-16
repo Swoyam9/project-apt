@@ -1,4 +1,4 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
 <header class="site-header">
     <a class="brand" href="${pageContext.request.contextPath}/home">AutoSpares</a>
     <nav class="nav">
