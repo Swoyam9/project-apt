@@ -41,12 +41,6 @@ If login shows "MySQL JDBC driver not found":
 Build manually if needed:
    mvn clean package
 
-Optional project-local database:
-   sh scripts/start-local-database.sh
-
-Stop local database:
-   sh scripts/stop-local-database.sh
-
 Default admin:
 - Email: admin@autospares.com
 - Password: admin123
@@ -61,8 +55,7 @@ MVC packages:
 
 Coursework coverage:
 - UI prototype in JSP/CSS
-- Wireframe/prototype notes in docs/WIREFRAME.md
-- 3NF schema in database.sql and ERD in docs/ERD.md
+- 3NF schema in src/main/resources/database.sql
 - Extra XAMPP table script in src/main/resources/xampp_required_tables.sql
 - phpMyAdmin restore script in src/main/resources/xampp_phpmyadmin_restore.sql
 - Registration, login, salted SHA-256 password hashing, session handling, auth filter, remember-me cookie
